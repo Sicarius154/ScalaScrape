@@ -7,21 +7,20 @@ import cats.effect.{ContextShift, Timer, ExitCode, IO}
 import org.slf4j.{Logger, LoggerFactory}
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
-
-
-import java.util.concurrent.Executors
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.ExecutionContext
 
 class Application()(implicit
-                    ec: ExecutionContext,
-                    cs: ContextShift[IO],
-                    timer: Timer[IO]
+    ec: ExecutionContext,
+    cs: ContextShift[IO],
+    timer: Timer[IO]
 ) {
   private val log: Logger = LoggerFactory.getLogger(getClass.getSimpleName)
 
   def execute(): IO[ExitCode] = {
     val config = loadConfig
-    IO.pure(ExitCode.Success)
+    for {
+      stream <- ParallelScrapingStream(config.streamConfig).runForever()
+    } yield stream
   }
 
   private def loadConfig: Config =

@@ -1,0 +1,5 @@
+package parsing
+
+trait DocumentParser {
+
+}
