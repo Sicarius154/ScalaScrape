@@ -21,6 +21,7 @@ import cats.implicits._
 import database.{RedisFrontierStore, FrontierStore}
 import dev.profunktor.redis4cats.{RedisCommands, Redis}
 import dev.profunktor.redis4cats.effect.Log.Stdout._
+import web.{HTTPWebResourceRetriever, WebResourceRetriever}
 
 import java.util.concurrent.Executors
 
@@ -39,10 +40,13 @@ class Application()(implicit
       redisHandle =>
         val frontierStore: FrontierStore =
           RedisFrontierStore(config.frontierConfig, redisHandle)
+
         withBlazeClient(newExecutionContext(50)) { client =>
+          val webResourceRetriever: HTTPWebResourceRetriever = HTTPWebResourceRetriever(client)
+
           for {
             stream <-
-              ParallelScrapingStream(config.streamConfig, client, frontierStore)
+              ParallelScrapingStream(config.streamConfig, client, frontierStore, webResourceRetriever)
                 .runForever()
           } yield stream
         }
@@ -55,7 +59,6 @@ class Application()(implicit
     ExecutionContext.fromExecutor(
       Executors.newFixedThreadPool(threads)
     )
-
 
   private def withBlazeClient(
       executionContext: ExecutionContext

@@ -1,17 +1,12 @@
 package application
 
 import cats.data.EitherT
-import fs2.kafka.{
-  ConsumerSettings,
-  AutoOffsetReset,
-  CommittableConsumerRecord,
-  KafkaConsumer
-}
+import fs2.kafka.{ConsumerSettings, AutoOffsetReset, CommittableConsumerRecord, KafkaConsumer}
 import cats.effect.{ContextShift, Async, Timer, ExitCode, IO, Sync}
 import cats.implicits.catsSyntaxFlatMapOps
 import config.StreamConfig
 import database.FrontierStore
-import domain.ScrapeTarget
+import domain.TargetSeed
 import fs2.Stream
 import io.circe.parser._
 import io.circe.generic.auto._
@@ -21,13 +16,16 @@ import org.http4s.{Query, Uri}
 import org.http4s.client.Client
 import org.http4s.client._
 import org.slf4j.{Logger, LoggerFactory}
+import web.WebResourceRetriever
+
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 class ParallelScrapingStream(
     streamConfig: StreamConfig,
     HTTPClient: Client[IO],
-    frontierStore: FrontierStore
+    frontierStore: FrontierStore,
+    webResourceRetriever: WebResourceRetriever
 )(implicit
     cs: ContextShift[IO],
     timer: Timer[IO],
@@ -54,13 +52,13 @@ class ParallelScrapingStream(
       .flatMap(_.stream)
       .mapAsync(20)(processKafkaRecord)
       .unNone
-      .mapAsync(20)(target => retrieveResource(target.seedURL, 1000))
+      .mapAsync(20)(target => webResourceRetriever.retrieveResource(target.seedURL, 1000))
       .parEvalMap(20)(_ => IO.unit)
 
   private[application] def processKafkaRecord(
       record: CommittableConsumerRecord[IO, String, String]
-  ): IO[Option[ScrapeTarget]] =
-    decode[ScrapeTarget](record.record.value) match {
+  ): IO[Option[TargetSeed]] =
+    decode[TargetSeed](record.record.value) match {
       case Right(target) => IO.pure(Some(target))
       case Left(e) => {
         IO(
@@ -76,12 +74,13 @@ object ParallelScrapingStream {
   def apply(
       streamConfig: StreamConfig,
       HTTPClient: Client[IO],
-      frontierStore: FrontierStore
+      frontierStore: FrontierStore,
+      webResourceRetriever: WebResourceRetriever
   )(implicit
       cs: ContextShift[IO],
       timer: Timer[IO],
       sync: Sync[IO],
       async: Async[IO]
   ): ParallelScrapingStream =
-    new ParallelScrapingStream(streamConfig, HTTPClient, frontierStore)
+    new ParallelScrapingStream(streamConfig, HTTPClient, frontierStore, webResourceRetriever)
 }

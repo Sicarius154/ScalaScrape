@@ -32,17 +32,10 @@ class HTTPWebResourceRetriever(httpClient: Client[IO])(implicit
 }
 
 object HTTPWebResourceRetriever {
-  private def apply(httpClient: Client[IO])(implicit
+  def apply(httpClient: Client[IO])(implicit
       cs: ContextShift[IO],
       timer: Timer[IO]
   ): HTTPWebResourceRetriever = new HTTPWebResourceRetriever(httpClient)
-
-  private def asResource(httpClient: Client[IO])(implicit
-      cs: ContextShift[IO],
-      timer: Timer[IO]
-  ): Resource[IO, HTTPWebResourceRetriever] = {
-    Resource.make(IO.pure(HTTPWebResourceRetriever(httpClient)))(_ => IO.unit)
-  }
 
   private[web] def http4sURI(
       https: Boolean,

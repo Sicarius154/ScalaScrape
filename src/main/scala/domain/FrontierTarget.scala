@@ -1,3 +1,3 @@
 package domain
 
-case class FrontierTarget ()
+case class FrontierTarget (URI: String)

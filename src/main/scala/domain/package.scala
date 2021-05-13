@@ -8,10 +8,15 @@ package object domain {
   implicit val politenessPolicyEncoder: Encoder[PolitenessPolicy] =
     deriveEncoder
 
-  implicit val scrapeTargetDecoder: Decoder[ScrapeTarget] =
+  implicit val scrapeTargetDecoder: Decoder[TargetSeed] =
     deriveDecoder
 
-  implicit val scrapeTargetEncoder: Encoder[ScrapeTarget] =
+  implicit val scrapeTargetEncoder: Encoder[TargetSeed] =
     deriveEncoder
 
+  implicit val frontierTargetDecoder: Decoder[FrontierTarget] =
+    deriveDecoder
+
+  implicit val frontierTargetEncoder: Encoder[FrontierTarget] =
+    deriveEncoder
 }
