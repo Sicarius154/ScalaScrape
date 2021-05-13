@@ -1,6 +1,4 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/chris/Git/ScalaScrape/src/main/scala/application/ParallelScrapingStream.scala:47:28: type mismatch;[0m
-[0m[[0m[31merror[0m] [0m[0m found   : fs2.kafka.CommittableConsumerRecord[[+A]cats.effect.IO[A],String,String][0m
-[0m[[0m[31merror[0m] [0m[0m required: fs2.kafka.CommittableConsumerRecord[cats.effect.IO,Option[String],String][0m
-[0m[[0m[31merror[0m] [0m[0m        processKafkaRecord(x)[0m
-[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/chris/Git/ScalaScrape/src/main/scala/application/Application.scala:60:8: not found: type Redis[0m
+[0m[[0m[31merror[0m] [0m[0m  )(f: Redis[IO] => IO[ExitCode]): IO[ExitCode] =[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
 [0m[[0m[31merror[0m] [0m[0mone error found[0m

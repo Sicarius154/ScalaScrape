@@ -66,4 +66,9 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-kafka" % testContainerVersion % "test"
 
   }
+
+  object Redis4Cats{
+    val redis4CatsVersion = "0.13.1"
+    val redis4CatsEffects = "dev.profunktor" %% "redis4cats-effects" % redis4CatsVersion
+  }
 }

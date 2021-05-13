@@ -27,7 +27,7 @@ lazy val root = (project in file("."))
       Dependencies.Http4s.http4sDsl,
       Dependencies.Fs2.fs2Core,
       Dependencies.Fs2.fs2Kafka,
-
+      Dependencies.Redis4Cats.redis4CatsEffects
     )
   )
 
